@@ -29,7 +29,7 @@ library(GenotypeMixtures)
 Experimental designs can be read in using this function if you point at a .csv
 Alternatively you can read in the .csv however you like, or construct from another file
 The experiments (10X channels (mixtures) should be rows, and the donors/genotypes should be columns. Membership is denoted by 1 vs 0.
-```{r, echo=FALSE}
+```{r, message=FALSE, warning=FALSE}
 exp_design_path = system.file("extdata", "experimental_design.csv", package = "GenotypeMixtures")
 experimental_design <- read_experimental_design(experimental_design_path = exp_design_path)
 plot_experimental_design(experimental_design)
@@ -38,14 +38,14 @@ plot_experimental_design(experimental_design)
 We can also read in the locations of the souporcell directories
 The first column should be the mixture name, the second column should be the path to the soup or cell directory
 There is some built in dummy vcf files in the package for this vignette
-```{r,echo=FALSE}
+```{r, message=FALSE}
 file_locations <- data.frame("channel" = rownames(experimental_design), 
                              "SOC_directory" =  file.path(system.file("extdata", package = "GenotypeMixtures"), rownames(experimental_design) ))
 head(file_locations)
 ```
 
 Now we plug this into the main function which constructs a genotype cluster graph
-```{r, echo=FALSE}
+```{r, message=FALSE}
 genotype_clustering_output <- construct_genotype_cluster_graph(experimental_design = experimental_design, file_locations = file_locations )
 ```
 
