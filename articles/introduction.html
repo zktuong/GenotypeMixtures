@@ -74,7 +74,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to GenotypeMixtures</h1>
             
-            <h4 class="date">2021-06-29</h4>
+            <h4 class="date">2021-07-01</h4>
       
       
       <div class="hidden name"><code>introduction.Rmd</code></div>
@@ -91,55 +91,53 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">GenotypeMixtures</span><span class="op">)</span></code></pre></div>
 <p>Experimental designs can be read in using this function if you point at a .csv Alternatively you can read in the .csv however you like, or construct from another file The experiments (10X channels (mixtures) should be rows, and the donors/genotypes should be columns. Membership is denoted by 1 vs 0.</p>
-<pre><code>#&gt; reading experimental design
-#&gt; Using channel as id variables</code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">exp_design_path</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"experimental_design.csv"</span>, package <span class="op">=</span> <span class="st">"GenotypeMixtures"</span><span class="op">)</span>
+<span class="va">experimental_design</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_experimental_design.html">read_experimental_design</a></span><span class="op">(</span>experimental_design_path <span class="op">=</span> <span class="va">exp_design_path</span><span class="op">)</span>
+<span class="fu"><a href="../reference/plot_experimental_design.html">plot_experimental_design</a></span><span class="op">(</span><span class="va">experimental_design</span><span class="op">)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>We can also read in the locations of the souporcell directories The first column should be the mixture name, the second column should be the path to the soup or cell directory There is some built in dummy vcf files in the package for this vignette</p>
-<pre><code>#&gt;      channel
-#&gt; 1 mixtures_1
-#&gt; 2 mixtures_2
-#&gt; 3 mixtures_3
-#&gt; 4 mixtures_4
-#&gt; 5 mixtures_5
-#&gt;                                                          SOC_directory
-#&gt; 1 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_1
-#&gt; 2 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_2
-#&gt; 3 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_3
-#&gt; 4 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_4
-#&gt; 5 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_5</code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">file_locations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="st">"channel"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">experimental_design</span><span class="op">)</span>, 
+                             <span class="st">"SOC_directory"</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"GenotypeMixtures"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">experimental_design</span><span class="op">)</span> <span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">file_locations</span><span class="op">)</span>
+<span class="co">#&gt;      channel</span>
+<span class="co">#&gt; 1 mixtures_1</span>
+<span class="co">#&gt; 2 mixtures_2</span>
+<span class="co">#&gt; 3 mixtures_3</span>
+<span class="co">#&gt; 4 mixtures_4</span>
+<span class="co">#&gt; 5 mixtures_5</span>
+<span class="co">#&gt;                                                          SOC_directory</span>
+<span class="co">#&gt; 1 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_1</span>
+<span class="co">#&gt; 2 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_2</span>
+<span class="co">#&gt; 3 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_3</span>
+<span class="co">#&gt; 4 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_4</span>
+<span class="co">#&gt; 5 /Users/runner/work/_temp/Library/GenotypeMixtures/extdata/mixtures_5</span></code></pre></div>
 <p>Now we plug this into the main function which constructs a genotype cluster graph</p>
-<pre><code>#&gt; checking files
-#&gt; 
-  |                                                                            
-  |                                                                      |   0%
-#&gt; 
-#&gt;    *****       ***   vcfR   ***       *****
-#&gt;    This is vcfR 1.12.0 
-#&gt;      browseVignettes('vcfR') # Documentation
-#&gt;      citation('vcfR') # Citation
-#&gt;    *****       *****      *****       *****
-#&gt; 
-  |                                                                            
-  |=======                                                               |  10%
-  |                                                                            
-  |==============                                                        |  20%
-  |                                                                            
-  |=====================                                                 |  30%
-  |                                                                            
-  |============================                                          |  40%
-  |                                                                            
-  |===================================                                   |  50%
-  |                                                                            
-  |==========================================                            |  60%
-  |                                                                            
-  |=================================================                     |  70%
-  |                                                                            
-  |========================================================              |  80%
-  |                                                                            
-  |===============================================================       |  90%
-  |                                                                            
-  |======================================================================| 100%
-#&gt; the membership graph is a collection of complete subgraphs as expected</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>genotype_clustering_output &lt;-<span class="st"> </span><span class="kw">construct_genotype_cluster_graph</span>(<span class="dt">experimental_design =</span> experimental_design, <span class="dt">file_locations =</span> file_locations )</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; </span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="st">  </span><span class="er">|</span><span class="st">                                                                      </span><span class="er">|</span><span class="st">   </span><span class="dv">0</span>%</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="st">  </span><span class="er">|=======</span><span class="st">                                                               </span><span class="er">|</span><span class="st">  </span><span class="dv">10</span>%</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="st">  </span><span class="er">|==============</span><span class="st">                                                        </span><span class="er">|</span><span class="st">  </span><span class="dv">20</span>%</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="st">  </span><span class="er">|=====================</span><span class="st">                                                 </span><span class="er">|</span><span class="st">  </span><span class="dv">30</span>%</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="st">  </span><span class="er">|============================</span><span class="st">                                          </span><span class="er">|</span><span class="st">  </span><span class="dv">40</span>%</span>
+<span id="cb5-13"><a href="#cb5-13"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="st">  </span><span class="er">|===================================</span><span class="st">                                   </span><span class="er">|</span><span class="st">  </span><span class="dv">50</span>%</span>
+<span id="cb5-15"><a href="#cb5-15"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="st">  </span><span class="er">|==========================================</span><span class="st">                            </span><span class="er">|</span><span class="st">  </span><span class="dv">60</span>%</span>
+<span id="cb5-17"><a href="#cb5-17"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="st">  </span><span class="er">|=================================================</span><span class="st">                     </span><span class="er">|</span><span class="st">  </span><span class="dv">70</span>%</span>
+<span id="cb5-19"><a href="#cb5-19"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="st">  </span><span class="er">|========================================================</span><span class="st">              </span><span class="er">|</span><span class="st">  </span><span class="dv">80</span>%</span>
+<span id="cb5-21"><a href="#cb5-21"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="st">  </span><span class="er">|===============================================================</span><span class="st">       </span><span class="er">|</span><span class="st">  </span><span class="dv">90</span>%</span>
+<span id="cb5-23"><a href="#cb5-23"></a>  <span class="op">|</span><span class="st">                                                                            </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="st">  </span><span class="er">|======================================================================|</span><span class="st"> </span><span class="dv">100</span>%</span></code></pre></div>
 <p>Now we can plot the graph which stitches together the genotypes</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">genotype_clustering_output</span><span class="op">$</span><span class="va">graph_plot</span></code></pre></div>
